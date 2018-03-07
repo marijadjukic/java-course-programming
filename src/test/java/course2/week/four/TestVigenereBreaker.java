@@ -36,4 +36,24 @@ public class TestVigenereBreaker {
         VigenereBreaker vb = new VigenereBreaker();
         vb.breakVigenere();
     }
+    @Test
+    public void testReadDictionary(){
+        VigenereBreaker vb = new VigenereBreaker();
+        FileResource fr = new FileResource("dictionaries/English");
+        System.out.println(vb.readDictionary(fr));
+    }
+    @Test
+    public void testCountWords(){
+        VigenereBreaker vb = new VigenereBreaker();
+        FileResource fr = new FileResource("vigenere/athens.txt");
+        FileResource dict = new FileResource("dictionaries/English");
+        String message = fr.asString();
+        HashSet<String> dictionary = vb.readDictionary(dict);
+        System.out.println(vb.countWords(message,dictionary));
+    }
+    @Test
+    public void testBreakVigenereUnknownKeyLength(){
+        VigenereBreaker vb = new VigenereBreaker();
+        vb.breakVigenereUnknownKeyLength();
+    }
 }

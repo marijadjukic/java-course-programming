@@ -29,4 +29,55 @@ public class VigenereBreaker {
         VigenereCipher vc = new VigenereCipher(key);
         System.out.println(vc.decrypt(input));
     }
+
+    public HashSet<String> readDictionary(FileResource fr){
+        HashSet<String> dictionary = new HashSet<String>();
+        for(String line : fr.lines()){
+            String word = line.toLowerCase();
+            dictionary.add(word);
+        }
+        return dictionary;
+    }
+
+    public int countWords(String message, HashSet<String> dictionary){
+        int count = 0;
+        String[] output = message.split("\\W+");
+        for(int i = 0; i<output.length; i++){
+            String word = output[i].toLowerCase();
+            if(dictionary.contains(word)){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public String breakForLanguage(String encrypted, HashSet<String> dictionary){
+        int maxCount = 0;
+        String answer = null;
+        int[] rightKey = new int[100];
+        for (int i = 1; i<100; i++) {
+            int[] key = tryKeyLength(encrypted, i, 'e');
+            VigenereCipher vc = new VigenereCipher(key);
+            String decrypt = vc.decrypt(encrypted);
+            int count = countWords(decrypt, dictionary);
+            if (count > maxCount) {
+                maxCount = count;
+                rightKey = key;
+                answer = decrypt;
+            }
+        }
+        System.out.println("Right key is " + Arrays.toString(rightKey) + " with length " + rightKey.length);
+        System.out.println("There are " + maxCount + " valid words.");
+        return answer;
+    }
+
+    public void breakVigenereUnknownKeyLength(){
+        FileResource fr = new FileResource();
+        String input = fr.asString();
+        FileResource dict = new FileResource("dictionaries/English");
+        HashSet<String> dictionary = readDictionary(dict);
+        String decrypted = breakForLanguage(input,dictionary);
+        System.out.println(decrypted);
+
+    }
 }

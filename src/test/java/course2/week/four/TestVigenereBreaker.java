@@ -56,4 +56,16 @@ public class TestVigenereBreaker {
         VigenereBreaker vb = new VigenereBreaker();
         vb.breakVigenereUnknownKeyLength();
     }
+    @Test
+    public void testMostCommonCharIn(){
+        VigenereBreaker vb = new VigenereBreaker();
+        FileResource fr = new FileResource("dictionaries/Italian");
+        HashSet<String> dictionary = vb.readDictionary(fr);
+        System.out.println("Most common char is " + vb.mostCommonCharIn(dictionary));
+    }
+    @Test
+    public void testBreakVigenereUnkownLanguage(){
+        VigenereBreaker vb = new VigenereBreaker();
+        vb.breakVigenereUnkownLanguage();
+    }
 }

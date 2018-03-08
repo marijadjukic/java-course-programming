@@ -1,5 +1,7 @@
 package course2.week.four;
 import edu.duke.*;
+
+import java.io.*;
 import java.util.*;
 
 public class VigenereBreaker {
@@ -55,8 +57,9 @@ public class VigenereBreaker {
         int maxCount = 0;
         String answer = null;
         int[] rightKey = new int[100];
+        char mostCommonLetter = mostCommonCharIn(dictionary);
         for (int i = 1; i<100; i++) {
-            int[] key = tryKeyLength(encrypted, i, 'e');
+            int[] key = tryKeyLength(encrypted, i, mostCommonLetter);
             VigenereCipher vc = new VigenereCipher(key);
             String decrypt = vc.decrypt(encrypted);
             int count = countWords(decrypt, dictionary);
@@ -80,4 +83,63 @@ public class VigenereBreaker {
         System.out.println(decrypted);
 
     }
+
+    public char mostCommonCharIn(HashSet<String> dictionary){
+        HashMap<Character, Integer> mapCountChar = new HashMap<Character, Integer>();
+        int maxValue = 0;
+        char mostCommonChar = ' ';
+        for(String word : dictionary){
+            for(int i = 0; i<word.length();i++){
+                char c = word.charAt(i);
+                if(!mapCountChar.containsKey(c)){
+                    mapCountChar.put(c,1);
+                }
+                else{
+                    mapCountChar.put(c,mapCountChar.get(c)+1);
+                }
+            }
+        }
+        for(char letter : mapCountChar.keySet()){
+            int value = mapCountChar.get(letter);
+            if(value > maxValue){
+                maxValue = value;
+                mostCommonChar = letter;
+            }
+        }
+        return mostCommonChar;
+    }
+
+    public String breakForAllLangs(String encrypted,HashMap<String, HashSet<String>> languages){
+        int maxCount = 0;
+        String answer = null;
+        String rightLanguage = null;
+        for(String language : languages.keySet()){
+            System.out.println(language);
+            HashSet<String> dictionary = languages.get(language);
+            String decrypt = breakForLanguage(encrypted,dictionary);
+            int count = countWords(decrypt,dictionary);
+            if(count > maxCount){
+                maxCount = count;
+                rightLanguage = language;
+                answer = decrypt;
+            }
+        }
+        System.out.println("Right language is " + rightLanguage);
+        return answer;
+    }
+
+    public void breakVigenereUnkownLanguage(){
+        HashMap<String, HashSet<String>> languages = new HashMap<String, HashSet<String>>();
+        DirectoryResource dr = new DirectoryResource();
+        for(File f : dr.selectedFiles()){
+            String fileName = f.getName();
+            FileResource fr = new FileResource(f);
+            HashSet<String> dictionary = readDictionary(fr);
+            languages.put(fileName,dictionary);
+        }
+        FileResource fr = new FileResource("vigenere/secretmessage4.txt");
+        String input = fr.asString();
+        System.out.println(breakForAllLangs(input,languages));
+    }
+
 }
